@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-import { Card, Row, Col, Icon, Avatar, Tag, Divider, Spin, Input } from 'antd';
+import { Card, Row, Col, Icon, Avatar, Tag,Form, Divider, Spin, Input, Button } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
+import _ from 'lodash';
 import styles from './Center.less';
 
 @connect(({ loading, user, project }) => ({
@@ -24,15 +25,6 @@ class Center extends PureComponent {
     const { dispatch } = this.props;
     dispatch({
       type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
-    });
-    dispatch({
-      type: 'project/fetchNotice',
     });
   }
 
@@ -90,8 +82,22 @@ class Center extends PureComponent {
       match,
       location,
       children,
+      form,
     } = this.props;
-
+    const { getFieldDecorator } = form;
+    const { data: user} = currentUser;
+    const formItemLayout = {
+      labelCol: {
+        xs: { span: 8},
+        sm: { span: 4 },
+        xs: { span: 4 }
+      },
+      wrapperCol: {
+        xs: { span: 16 },
+        sm: { span: 18 },
+        xs: { span: 18 }
+      },
+    };
     const operationTabList = [
       {
         key: 'articles',
@@ -118,84 +124,51 @@ class Center extends PureComponent {
         ),
       },
     ];
-
+    console.log('sss', user)
     return (
       <GridContent className={styles.userCenter}>
         <Row gutter={24}>
-          <Col lg={7} md={24}>
+          <Col lg={10} md={24}>
             <Card bordered={false} style={{ marginBottom: 24 }} loading={currentUserLoading}>
-              {currentUser && Object.keys(currentUser).length ? (
+              {user && Object.keys(user).length ? (
                 <div>
-                  <div className={styles.avatarHolder}>
-                    <img alt="" src={currentUser.avatar} />
-                    <div className={styles.name}>{currentUser.name}</div>
-                    <div>{currentUser.signature}</div>
-                  </div>
-                  <div className={styles.detail}>
-                    <p>
-                      <i className={styles.title} />
-                      {currentUser.title}
-                    </p>
-                    <p>
-                      <i className={styles.group} />
-                      {currentUser.group}
-                    </p>
-                    <p>
-                      <i className={styles.address} />
-                      {currentUser.geographic.province.label}
-                      {currentUser.geographic.city.label}
-                    </p>
-                  </div>
-                  <Divider dashed />
-                  <div className={styles.tags}>
-                    <div className={styles.tagsTitle}>标签</div>
-                    {currentUser.tags.concat(newTags).map(item => (
-                      <Tag key={item.key}>{item.label}</Tag>
-                    ))}
-                    {inputVisible && (
-                      <Input
-                        ref={this.saveInputRef}
-                        type="text"
-                        size="small"
-                        style={{ width: 78 }}
-                        value={inputValue}
-                        onChange={this.handleInputChange}
-                        onBlur={this.handleInputConfirm}
-                        onPressEnter={this.handleInputConfirm}
-                      />
-                    )}
-                    {!inputVisible && (
-                      <Tag
-                        onClick={this.showInput}
-                        style={{ background: '#fff', borderStyle: 'dashed' }}
-                      >
-                        <Icon type="plus" />
-                      </Tag>
-                    )}
-                  </div>
-                  <Divider style={{ marginTop: 16 }} dashed />
-                  <div className={styles.team}>
-                    <div className={styles.teamTitle}>团队</div>
-                    <Spin spinning={projectLoading}>
-                      <Row gutter={36}>
-                        {notice.map(item => (
-                          <Col key={item.id} lg={24} xl={12}>
-                            <Link to={item.href}>
-                              <Avatar size="small" src={item.logo} />
-                              {item.member}
-                            </Link>
-                          </Col>
-                        ))}
-                      </Row>
-                    </Spin>
-                  </div>
+                  <Avatar size={100} src={user.avatar} />
+                  <Form onSubmit={this.handleSubmit} className={styles.userForm}>
+                  <Form.Item {...formItemLayout} label="姓名">
+                    {getFieldDecorator('name', {
+                      initialValue: _.get(user, 'name'),
+                      rules: [{ required: true, message: '姓名不能为空' }],
+                    })(<Input />)}
+                  </Form.Item>
+                  <Form.Item {...formItemLayout} label="邮箱">
+                    {getFieldDecorator('mail', {
+                      initialValue: _.get(user, 'mail'),
+                      rules: [{ required: true, message: '邮箱不能为空' }],
+                    })(<Input />)}
+                  </Form.Item>
+                  <Form.Item {...formItemLayout} label="手机">
+                    {getFieldDecorator('phoneNumber', {
+                      initialValue: _.get(user, 'phoneNumber'),
+                      rules: [{ required: true, message: '手机不能为空' }],
+                    })(<Input />)}
+                  </Form.Item>
+                  <Form.Item {...formItemLayout} label="头像">
+                    {getFieldDecorator('avatar', {
+                      initialValue: _.get(user, 'avatar'),
+                      // rules: [{ required: true, message: '手机不能为空' }],
+                    })(<Input.TextArea autosize={{ minRows: 3 }} placeholder="暂不支持上传头像，仅可通过网络链接修改" />)}
+                  </Form.Item>
+                  <Form.Item {...formItemLayout} className="submit" >
+                    <Button type="primary" htmlType="submit">保存</Button>
+                  </Form.Item>
+                </Form>
                 </div>
               ) : (
                 'loading...'
               )}
             </Card>
           </Col>
-          <Col lg={17} md={24}>
+          <Col lg={14} md={24}>
             <Card
               className={styles.tabsCard}
               bordered={false}
@@ -204,7 +177,7 @@ class Center extends PureComponent {
               onTabChange={this.onTabChange}
               loading={listLoading}
             >
-              {children}
+              {/* {children} */}
             </Card>
           </Col>
         </Row>
@@ -213,4 +186,4 @@ class Center extends PureComponent {
   }
 }
 
-export default Center;
+export default Form.create()(Center);
