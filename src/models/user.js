@@ -1,4 +1,4 @@
-import { query as queryUsers, queryCurrent } from '@/services/user';
+import { query as queryUsers, queryCurrent, updataCurrent } from '@/services/user';
 
 export default {
   namespace: 'user',
@@ -23,6 +23,10 @@ export default {
         payload: response,
       });
     },
+    *updataCurrent({payload, callback}, { call, put }) {
+      const response = yield call(updataCurrent, payload);
+      callback && callback(response);
+    }
   },
 
   reducers: {

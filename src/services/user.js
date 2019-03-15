@@ -9,3 +9,12 @@ export async function queryCurrent() {
     method: 'GET'
   });
 }
+
+export async function updataCurrent(params) {
+  return request('/u/updataCurrent', {
+    method: 'POST',
+    body: {
+      ...params,
+    },
+  });
+}

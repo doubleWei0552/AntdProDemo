@@ -4,8 +4,8 @@ import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
-// const apiUrl = 'http://localhost:9000/API';
-const apiUrl = 'http://39.98.51.33:9000/API';
+const apiUrl = 'http://localhost:9000/API';
+// const apiUrl = 'http://39.98.51.33:9000/API';
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',

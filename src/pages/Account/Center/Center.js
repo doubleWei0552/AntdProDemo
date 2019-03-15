@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-import { Card, Row, Col, Icon, Avatar, Tag,Form, Divider, Spin, Input, Button } from 'antd';
+import { Card, Row, Col, Icon, Avatar,message, Tag,Form, Divider, Spin, Input, Button } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import _ from 'lodash';
 import styles from './Center.less';
@@ -57,19 +57,26 @@ class Center extends PureComponent {
     this.setState({ inputValue: e.target.value });
   };
 
-  handleInputConfirm = () => {
-    const { state } = this;
-    const { inputValue } = state;
-    let { newTags } = state;
-    if (inputValue && newTags.filter(tag => tag.label === inputValue).length === 0) {
-      newTags = [...newTags, { key: `new-${newTags.length}`, label: inputValue }];
-    }
-    this.setState({
-      newTags,
-      inputVisible: false,
-      inputValue: '',
-    });
-  };
+  handleSubmit = () =>{
+    const { dispatch } = this.props;
+    this.props.form.validateFields((err, values) => {
+      dispatch({
+        type: 'user/updataCurrent',
+        payload: values,
+        callback: (response) => {
+          console.log('response', response)
+          if(response.success){
+            dispatch({
+              type: 'user/fetchCurrent',
+            });
+          }else{
+            message.error('出现错误')
+          }
+        }
+      })
+    })
+  }
+
 
   render() {
     const { newTags, inputVisible, inputValue } = this.state;
@@ -133,7 +140,7 @@ class Center extends PureComponent {
               {user && Object.keys(user).length ? (
                 <div>
                   <Avatar size={100} src={user.avatar} />
-                  <Form onSubmit={this.handleSubmit} className={styles.userForm}>
+                  <Form className={styles.userForm}>
                   <Form.Item {...formItemLayout} label="姓名">
                     {getFieldDecorator('name', {
                       initialValue: _.get(user, 'name'),
@@ -159,7 +166,7 @@ class Center extends PureComponent {
                     })(<Input.TextArea autosize={{ minRows: 3 }} placeholder="暂不支持上传头像，仅可通过网络链接修改" />)}
                   </Form.Item>
                   <Form.Item {...formItemLayout} className="submit" >
-                    <Button type="primary" htmlType="submit">保存</Button>
+                    <Button type="primary" onClick={this.handleSubmit} >保存</Button>
                   </Form.Item>
                 </Form>
                 </div>
