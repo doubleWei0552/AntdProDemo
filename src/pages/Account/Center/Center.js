@@ -2,11 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-<<<<<<< HEAD
 import { Card, Row, Col, Icon, Avatar,message, Tag,Form, Divider, Spin, Input, Button } from 'antd';
-=======
-import { Card, Row, Col, Icon, Avatar, Tag, Form, Divider, Spin, Input, Button } from 'antd';
->>>>>>> 8cde70750a89cbc6ad6327084b251b05dcb004d1
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import _ from 'lodash';
 import styles from './Center.less';
@@ -144,7 +140,6 @@ class Center extends PureComponent {
               {user && Object.keys(user).length ? (
                 <div>
                   <Avatar size={100} src={user.avatar} />
-<<<<<<< HEAD
                   <Form className={styles.userForm}>
                   <Form.Item {...formItemLayout} label="姓名">
                     {getFieldDecorator('name', {
@@ -174,45 +169,6 @@ class Center extends PureComponent {
                     <Button type="primary" onClick={this.handleSubmit} >保存</Button>
                   </Form.Item>
                 </Form>
-=======
-                  <Form onSubmit={this.handleSubmit} className={styles.userForm}>
-                    <Form.Item {...formItemLayout} label="姓名">
-                      {getFieldDecorator('name', {
-                        initialValue: _.get(user, 'name'),
-                        rules: [{ required: true, message: '姓名不能为空' }],
-                      })(<Input />)}
-                    </Form.Item>
-                    <Form.Item {...formItemLayout} label="邮箱">
-                      {getFieldDecorator('mail', {
-                        initialValue: _.get(user, 'mail'),
-                        rules: [{ required: true, message: '邮箱不能为空' }],
-                      })(<Input />)}
-                    </Form.Item>
-                    <Form.Item {...formItemLayout} label="手机">
-                      {getFieldDecorator('phoneNumber', {
-                        initialValue: _.get(user, 'phoneNumber'),
-                        rules: [{ required: true, message: '手机不能为空' }],
-                      })(<Input />)}
-                    </Form.Item>
-
-                    <Form.Item {...formItemLayout} label="头像">
-                      {getFieldDecorator('avatar', {
-                        initialValue: _.get(user, 'avatar'),
-                        // rules: [{ required: true, message: '手机不能为空' }],
-                      })(
-                        <Input.TextArea
-                          autosize={{ minRows: 3 }}
-                          placeholder="暂不支持上传头像，仅可通过网络链接修改"
-                        />
-                      )}
-                    </Form.Item>
-                    <Form.Item {...formItemLayout} className="submit">
-                      <Button type="primary" htmlType="submit">
-                        保存
-                      </Button>
-                    </Form.Item>
-                  </Form>
->>>>>>> 8cde70750a89cbc6ad6327084b251b05dcb004d1
                 </div>
               ) : (
                 'loading...'
