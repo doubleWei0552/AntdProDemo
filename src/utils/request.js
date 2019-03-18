@@ -4,8 +4,8 @@ import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
-const apiUrl = 'http://localhost:9000/API';
-// const apiUrl = 'http://39.98.51.33:9000/API';
+// const apiUrl = 'http://localhost:9000/API';
+const apiUrl = 'http://39.98.51.33:9000/API';
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -125,40 +125,42 @@ export default function request(url, option) {
   //   }
   // }
   // return fetch(apiUrl + url, newOptions)
-  console.log('sssss', newOptions)
+  console.log('sssss', newOptions);
   // debugger
-  return fetch(apiUrl + url, newOptions)
-    .then(checkStatus)
-    // .then(response => cachedSave(response, hashcode))
-    .then(response => {
-      // DELETE and 204 do not return data by default
-      // using .json will report an error.
-      // if (newOptions.method === 'DELETE' || response.status === 204) {
-      //   return response.text();
-      // }
-      return response.json();
-    })
-    .catch(e => {
-      const status = e.name;
-      if (status === 401) {
-        // @HACK
-        /* eslint-disable no-underscore-dangle */
-        window.g_app._store.dispatch({
-          type: 'login/logout',
-        });
-        return;
-      }
-      // environment should not be used
-      if (status === 403) {
-        router.push('/exception/403');
-        return;
-      }
-      if (status <= 504 && status >= 500) {
-        router.push('/exception/500');
-        return;
-      }
-      if (status >= 404 && status < 422) {
-        router.push('/exception/404');
-      }
-    });
+  return (
+    fetch(apiUrl + url, newOptions)
+      .then(checkStatus)
+      // .then(response => cachedSave(response, hashcode))
+      .then(response => {
+        // DELETE and 204 do not return data by default
+        // using .json will report an error.
+        // if (newOptions.method === 'DELETE' || response.status === 204) {
+        //   return response.text();
+        // }
+        return response.json();
+      })
+      .catch(e => {
+        const status = e.name;
+        if (status === 401) {
+          // @HACK
+          /* eslint-disable no-underscore-dangle */
+          window.g_app._store.dispatch({
+            type: 'login/logout',
+          });
+          return;
+        }
+        // environment should not be used
+        if (status === 403) {
+          router.push('/exception/403');
+          return;
+        }
+        if (status <= 504 && status >= 500) {
+          router.push('/exception/500');
+          return;
+        }
+        if (status >= 404 && status < 422) {
+          router.push('/exception/404');
+        }
+      })
+  );
 }
