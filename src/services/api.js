@@ -10,7 +10,9 @@ export async function queryActivities() {
 }
 
 export async function queryRule(params) {
-  return request(`/api/rule?${stringify(params)}`);
+  return request(`/u/allusers?${stringify(params)}`,{
+    method: 'GET',
+  });
 }
 
 export async function removeRule(params) {

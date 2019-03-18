@@ -23,9 +23,11 @@ import {
   Radio,
 } from 'antd';
 import StandardTable from '@/components/StandardTable';
+import _ from 'lodash';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 import styles from './TableList.less';
+import { loadBizCharts } from '@/components/Charts/AsyncLoadBizCharts';
 
 const FormItem = Form.Item;
 const { Step } = Steps;
@@ -291,60 +293,31 @@ class TableList extends PureComponent {
 
   columns = [
     {
-      title: '规则名称',
+      title: '姓名',
       dataIndex: 'name',
       render: text => <a onClick={() => this.previewItem(text)}>{text}</a>,
     },
     {
-      title: '描述',
-      dataIndex: 'desc',
+      title: '手机',
+      dataIndex: 'phoneNumber',
     },
     {
-      title: '服务调用次数',
-      dataIndex: 'callNo',
-      sorter: true,
-      render: val => `${val} 万`,
-      // mark to display a total number
-      needTotal: true,
+      title: '邮箱',
+      dataIndex: 'mail',
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      filters: [
-        {
-          text: status[0],
-          value: 0,
-        },
-        {
-          text: status[1],
-          value: 1,
-        },
-        {
-          text: status[2],
-          value: 2,
-        },
-        {
-          text: status[3],
-          value: 3,
-        },
-      ],
-      render(val) {
-        return <Badge status={statusMap[val]} text={status[val]} />;
-      },
-    },
-    {
-      title: '上次调度时间',
-      dataIndex: 'updatedAt',
-      sorter: true,
+      title: '上次更新时间',
+      dataIndex: 'meta.updateAt',
+      // sorter: true,
       render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
     },
     {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
-          <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          {/* <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a> */}
+          {/* <Divider type="vertical" /> */}
+          <a href="">查看</a>
         </Fragment>
       ),
     },
@@ -352,8 +325,13 @@ class TableList extends PureComponent {
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const params = {
+      pageSize: 10,
+      pageIndex: 1,
+    }
     dispatch({
       type: 'rule/fetch',
+      payload: params,
     });
   }
 
@@ -629,6 +607,8 @@ class TableList extends PureComponent {
       rule: { data },
       loading,
     } = this.props;
+    const users = _.get(data, 'data');
+    console.log('props', this.props)
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -649,7 +629,7 @@ class TableList extends PureComponent {
       <PageHeaderWrapper title="查询表格">
         <Card bordered={false}>
           <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
+            {/* <div className={styles.tableListForm}>{this.renderForm()}</div> */}
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
@@ -666,9 +646,10 @@ class TableList extends PureComponent {
               )}
             </div>
             <StandardTable
+              rowKey={record => record.mail}
               selectedRows={selectedRows}
               loading={loading}
-              data={data}
+              data={users}
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}

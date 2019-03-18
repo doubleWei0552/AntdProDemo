@@ -15,7 +15,12 @@ export default {
       const response = yield call(queryRule, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: {
+          data: {
+            list: response.data.list,
+            pagination: response.data.pagination,
+          },
+        },
       });
     },
     *add({ payload, callback }, { call, put }) {
