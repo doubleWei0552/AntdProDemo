@@ -4,8 +4,8 @@ import router from 'umi/router';
 import hash from 'hash.js';
 import { isAntdPro } from './utils';
 
-// const apiUrl = 'http://localhost:9000/API';
-const apiUrl = 'http://39.98.51.33:9000/API';
+// const apiUrl = window.config.pro_apiUrl;
+const {apiUrl} = window.config;
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -74,14 +74,14 @@ export default function request(url, option) {
    * Produce fingerprints based on url and parameters
    * Maybe url has the same parameters
    */
-  const fingerprint = apiUrl + url + (options.body ? JSON.stringify(options.body) : '');
+  const fingerprint = `${apiUrl}/API${  url  }${options.body ? JSON.stringify(options.body) : ''}`;
   const hashcode = hash
     .sha256()
     .update(fingerprint)
     .digest('hex');
 
   const defaultOptions = {
-    credentials: 'include',
+    // credentials: 'include',
   };
   const newOptions = { ...defaultOptions, ...options };
   console.log('222', newOptions);
@@ -128,7 +128,7 @@ export default function request(url, option) {
   console.log('sssss', newOptions);
   // debugger
   return (
-    fetch(apiUrl + url, newOptions)
+    fetch(`${apiUrl  }/API${  url}`, newOptions)
       .then(checkStatus)
       // .then(response => cachedSave(response, hashcode))
       .then(response => {
@@ -137,6 +137,7 @@ export default function request(url, option) {
         // if (newOptions.method === 'DELETE' || response.status === 204) {
         //   return response.text();
         // }
+        console.log('response', response)
         return response.json();
       })
       .catch(e => {

@@ -16,12 +16,16 @@ export default {
         payload: response,
       });
     },
-    *fetchCurrent(_, { call, put }) {
+    *fetchCurrent({payload, callback}, { call, put }) {
       const response = yield call(queryCurrent);
+      if(payload) {
+        response.data.avatar= payload.url;
+      }
       yield put({
         type: 'saveCurrentUser',
         payload: response,
       });
+      callback && callback(response);
     },
     *updataCurrent({payload, callback}, { call, put }) {
       const response = yield call(updataCurrent, payload);

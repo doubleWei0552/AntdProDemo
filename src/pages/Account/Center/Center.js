@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-import { Card, Row, Col, Icon, Avatar,message, Tag,Form, Divider, Spin, Input, Button } from 'antd';
+import { Card, Row,Upload, Col, Icon, Avatar,message, Tag,Form, Divider, Spin, Input, Button } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import _ from 'lodash';
 import styles from './Center.less';
@@ -19,6 +19,7 @@ class Center extends PureComponent {
     newTags: [],
     inputVisible: false,
     inputValue: '',
+    avatar:'',
   };
 
   componentDidMount() {
@@ -64,8 +65,8 @@ class Center extends PureComponent {
         type: 'user/updataCurrent',
         payload: values,
         callback: (response) => {
-          console.log('response', response)
           if(response.success){
+            message.success('保存成功');
             dispatch({
               type: 'user/fetchCurrent',
             });
@@ -77,9 +78,23 @@ class Center extends PureComponent {
     })
   }
 
+  handleChange =(info) => {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+      this.setState({
+        avatar: info.file.response.data.url,
+      })
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  }
+
 
   render() {
-    const { newTags, inputVisible, inputValue } = this.state;
+    const { newTags, inputVisible, inputValue, avatar } = this.state;
     const {
       listLoading,
       currentUser,
@@ -90,9 +105,11 @@ class Center extends PureComponent {
       location,
       children,
       form,
+      dispatch,
     } = this.props;
     const { getFieldDecorator } = form;
     const { data: user } = currentUser;
+    const uploadAvatar = '';
     const formItemLayout = {
       labelCol: {
         xs: { span: 8 },
@@ -131,44 +148,83 @@ class Center extends PureComponent {
         ),
       },
     ];
+    
+    const uploadProps = {
+      name: 'file',
+      action: `${window.config.apiUrl}/API/u/uploadavatar`,
+      headers: {
+        Authorization: localStorage.getItem('accessToken') || '',
+      },
+      // onChange: this.handleChange,
+  
+      onChange(info) {
+        if (info.file.status !== 'uploading') {
+          // console.log(info.file, info.fileList);
+        }
+        if (info.file.status === 'done') {
+          message.success(`${info.file.name} file uploaded successfully`);
+          if(info.file.response.success){
+            // uploadAvatar = window.config.apiUrl+info.file.response.data.url;
+            dispatch({
+              type: 'user/fetchCurrent',
+              payload: {url: window.config.apiUrl+info.file.response.data.url},
+              callback: () => {
+                user.avatar = window.config.apiUrl+info.file.response.data.url;
+              }
+            });
+            
+          }
+          
+        } else if (info.file.status === 'error') {
+          message.error(`${info.file.name} file upload failed.`);
+        }
+      },
+    };
     console.log('sss', user);
     return (
       <GridContent className={styles.userCenter}>
         <Row gutter={24}>
           <Col lg={10} md={24}>
-            <Card bordered={false} style={{ marginBottom: 24 }} loading={currentUserLoading}>
+            <Card bordered={false} style={{ marginBottom: 24 }} loading={false}>
               {user && Object.keys(user).length ? (
-                <div>
-                  <Avatar size={100} src={user.avatar} />
+                <div className={styles.userAvatar}>
+                  
+                  {/* file:///Users/weiwei/Desktop/NodeDemo/app/controllers/static/upload/3.jpg */}
+                  <Avatar key={_.now()} size={100} src={uploadAvatar || user.avatar} />
+                  <Upload {...uploadProps} showUploadList={false}>
+                    <Button>
+                      <Icon type="upload" />更换头像
+                    </Button>
+                  </Upload>
                   <Form className={styles.userForm}>
-                  <Form.Item {...formItemLayout} label="姓名">
-                    {getFieldDecorator('name', {
+                    <Form.Item {...formItemLayout} label="姓名">
+                      {getFieldDecorator('name', {
                       initialValue: _.get(user, 'name'),
                       rules: [{ required: true, message: '姓名不能为空' }],
                     })(<Input />)}
-                  </Form.Item>
-                  <Form.Item {...formItemLayout} label="邮箱">
-                    {getFieldDecorator('mail', {
+                    </Form.Item>
+                    <Form.Item {...formItemLayout} label="邮箱">
+                      {getFieldDecorator('mail', {
                       initialValue: _.get(user, 'mail'),
                       rules: [{ required: true, message: '邮箱不能为空' }],
                     })(<Input />)}
-                  </Form.Item>
-                  <Form.Item {...formItemLayout} label="手机">
-                    {getFieldDecorator('phoneNumber', {
+                    </Form.Item>
+                    <Form.Item {...formItemLayout} label="手机">
+                      {getFieldDecorator('phoneNumber', {
                       initialValue: _.get(user, 'phoneNumber'),
                       rules: [{ required: true, message: '手机不能为空' }],
                     })(<Input />)}
-                  </Form.Item>
-                  <Form.Item {...formItemLayout} label="头像">
+                    </Form.Item>
+                    {/* <Form.Item {...formItemLayout} label=""> */}
                     {getFieldDecorator('avatar', {
                       initialValue: _.get(user, 'avatar'),
                       // rules: [{ required: true, message: '手机不能为空' }],
-                    })(<Input.TextArea autosize={{ minRows: 3 }} placeholder="暂不支持上传头像，仅可通过网络链接修改" />)}
-                  </Form.Item>
-                  <Form.Item {...formItemLayout} className="submit" >
-                    <Button type="primary" onClick={this.handleSubmit} >保存</Button>
-                  </Form.Item>
-                </Form>
+                    })(<Input type='hidden' />)}
+                    {/* </Form.Item> */}
+                    <Form.Item className="submit">
+                      <Button type="primary" onClick={this.handleSubmit}>保存</Button>
+                    </Form.Item>
+                  </Form>
                 </div>
               ) : (
                 'loading...'
