@@ -107,6 +107,7 @@ class Info extends Component {
             this.main = ref;
           }}
         >
+        sss
           <div className={styles.leftmenu}>
             <Menu mode={mode} selectedKeys={[selectKey]} onClick={this.selectKey}>
               {this.getmenu()}

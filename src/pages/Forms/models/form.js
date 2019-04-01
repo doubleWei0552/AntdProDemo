@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router';
 import { message } from 'antd';
-import { fakeSubmitForm } from '@/services/api';
+import { fakeSubmitForm, createArticle } from '@/services/api';
 
 export default {
   namespace: 'form',
@@ -31,6 +31,13 @@ export default {
       yield call(fakeSubmitForm, payload);
       message.success('提交成功');
     },
+
+    *createArticle({ payload, callback }, { call, put }) {
+      const response = yield call(createArticle, payload);
+      if(callback) {
+        callback(response)
+      }
+    }
   },
 
   reducers: {

@@ -126,3 +126,10 @@ export async function queryNotices(params = {}) {
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
+
+export async function createArticle(params) {
+  return request('/article/createarticle', {
+    method: 'POST',
+    body: params,
+  });
+}
