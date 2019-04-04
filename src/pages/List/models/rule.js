@@ -1,4 +1,4 @@
-import { queryRule, removeRule, addRule, updateRule } from '@/services/api';
+import { queryRule, removeRule, addRule, updateRule, getArticleById, deleteArticleById } from '@/services/api';
 
 export default {
   namespace: 'rule',
@@ -46,7 +46,19 @@ export default {
         payload: response,
       });
       if (callback) callback();
+    }, 
+    *getArticleById({ payload, callback }, { call, put }) {
+      const response = yield call(getArticleById, payload);
+      if(callback) {
+        callback(response)
+      }
     },
+    *deleteArticleById({ payload, callback }, { call, put }) {
+      const response = yield call(deleteArticleById, payload);
+      if(callback) {
+        callback(response)
+      }
+    }
   },
 
   reducers: {

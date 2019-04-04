@@ -10,7 +10,7 @@ export async function queryActivities() {
 }
 
 export async function queryRule(params) {
-  return request(`/u/allusers?${stringify(params)}`,{
+  return request(`/article/myarticles?${stringify(params)}`,{
     method: 'GET',
   });
 }
@@ -131,5 +131,17 @@ export async function createArticle(params) {
   return request('/article/createarticle', {
     method: 'POST',
     body: params,
+  });
+}
+
+export async function getArticleById(params) {
+  return request(`/article/getArticleById?id=${params.id}`, {
+    method: 'GET',
+  });
+}
+
+export async function deleteArticleById(params) {
+  return request(`/article/deleteArticleById?id=${params.id}`, {
+    method: 'DELETE',
   });
 }

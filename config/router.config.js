@@ -123,6 +123,11 @@ export default [
                 component: './List/Articles',
               },
               {
+                path: '/list/search/articledetail/:id',
+                name: 'articles',
+                component: './List/ArticleDetail',
+              },
+              {
                 path: '/list/search/projects',
                 name: 'projects',
                 component: './List/Projects',

@@ -293,31 +293,38 @@ class TableList extends PureComponent {
 
   columns = [
     {
-      title: '姓名',
-      dataIndex: 'name',
+      title: '作者',
+      dataIndex: 'Author.name',
       render: text => <a onClick={() => this.previewItem(text)}>{text}</a>,
     },
     {
-      title: '手机',
-      dataIndex: 'phoneNumber',
+      title: '文章标题',
+      dataIndex: 'articleName',
     },
     {
-      title: '邮箱',
-      dataIndex: 'mail',
+      title: '类别',
+      dataIndex: 'type',
     },
     {
-      title: '上次更新时间',
+      title: '是否发表',
+      dataIndex: 'isDraft',
+      render: text => <span>{text ? '否': '是' }</span>,
+    },
+    {
+      title: '上次编辑时间',
       dataIndex: 'meta.updateAt',
       // sorter: true,
       render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
     },
     {
       title: '操作',
+      align: 'center',
       render: (text, record) => (
         <Fragment>
           {/* <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a> */}
-          {/* <Divider type="vertical" /> */}
-          <a href="">查看</a>
+          <a onClick={()=>this.deleteArticleById(record._id)}>删除</a>
+          <Divider type="vertical" />
+          <a onClick={() => router.push(`/list/search/articledetail/${record._id}`)}>查看</a>
         </Fragment>
       ),
     },
@@ -333,6 +340,28 @@ class TableList extends PureComponent {
       type: 'rule/fetch',
       payload: params,
     });
+  }
+
+  deleteArticleById =(id) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'rule/deleteArticleById',
+      payload: {id},
+      callback: response => {
+        if(response.success){
+          message.success('删除成功')
+          dispatch({
+            type: 'rule/fetch',
+            payload: {
+              pageSize: 10,
+              pageIndex: 1,
+            },
+          });
+        }else{
+          message.error(response.data.errorMessage)
+        }
+      }
+    })
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
